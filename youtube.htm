@@ -1,0 +1,107 @@
+<!--removed a jquery-ui css file, note in case of any issue with the library -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js" type="text/javascript"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript"></script>
+			
+<style>
+
+<!-- jquery-ui css override -->
+.ui-draggable-disabled 
+{ 
+	opacity: .75 !important;
+	filter: Alpha(Opacity=75) !important;
+	
+}
+
+.ui-state-disabled 
+{ 
+	opacity: .75 !important;
+	filter: Alpha(Opacity=75) !important;
+	
+}
+
+.pointer
+{
+	height:40px; 
+	width:40px;
+	display:inline-block; 
+	color:white; 
+	background-image:url('file:///c:/vikesh/development/experiments/pointers/images/callout.png'); 
+	background-repeat:no-repeat; 			
+	font-family: Arial;
+	font-size:12px;
+}
+	
+.pointer span 
+{
+	text-align:center;
+	margin: 10px 0px 0px 0px;
+	display: block;
+}
+	
+
+</style>
+
+<script>
+	var player;
+	
+	function init()
+	{
+		try
+		{
+			player = document.getElementById('movie_player');
+			player.getVideoBytesLoaded()/player.getVideoBytesTotal();
+			document.getElementNameById('base-bar').style.width = player.width ;
+		}
+		catch(err)
+		{
+	
+		}
+	
+		$(document).ready(function(){
+		
+			$(document).keydown(function(event){ 
+						if(event.keyCode == '16')  
+							$(".pointer").draggable("enable");
+						});
+						
+					$(document).keyup(function(){ 
+							$(".pointer").draggable("disable");
+						});
+		});
+		
+		$(function() {
+				$( ".pointer").draggable( {axis: "x", drag: handleDrag, containment: 'parent', disabled : true, addClasses: false});
+				$(".pointer").mouseover(function(){ this.style.cursor = "pointer"; } );
+				
+				
+				$(".pointer").click( function(){
+					/* seek code goes here */
+					//alert("You Clicked");
+					
+				});
+				
+			});
+	}
+	
+	function handleDrag(event, ui)
+	{
+			this.firstChild.innerHTML = event.altKey;
+			
+	}
+
+	init();
+ </script>
+ <div style="margin:10px 0px;">
+ <div id="pointers">
+	 <div class="pointer"><span>0.0</span></div>
+	 <div class="pointer"><span>1.823</span></div>
+	 <div class="pointer"><span>1.823</span></div>
+	 <div class="pointer"><span>1.823</span></div>
+	 
+</div>
+<div style="height:5px; background-color:#a8a8a8;" name=" " id="base-bar"></div>
+<div style="height: 5px; position:relative; top:-5px; z-index:2; background-color:#cc1111"></div>
+<button data-tooltip-text="Gimme new pointer" onclick=";return false;" type="button" class="start yt-uix-tooltip-reverse yt-uix-button yt-uix-button yt-uix-tooltip" id="new_pointer" role="button" style="margin:10px 0px 10px 0px;" title="Gimme new pointer">New Pointer</button>
+<button data-tooltip-text="Disable" onclick=";return false;" type="button" class="start yt-uix-tooltip-reverse yt-uix-button yt-uix-button yt-uix-tooltip" id="disable_extension" role="button" style="margin:10px 0px 10px 0px;" title="Disable Extension">Disable Extension</button>
+<div style="margin:10px; display:inline;">Hold <b>Shift</b> key to drag pointers. <b>Ctrl</b> + Click to delete pointers.</div>
+</div>

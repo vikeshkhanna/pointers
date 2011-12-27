@@ -1,0 +1,44 @@
+<!-- jquery-ui css override -->
+.ui-draggable-disabled 
+{ 
+	opacity: .75 !important;
+	filter: Alpha(Opacity=75) !important;
+	
+}
+
+.ui-state-disabled 
+{ 
+	opacity: .75 !important;
+	filter: Alpha(Opacity=75) !important;
+	
+}
+
+.pointer
+{
+	height:40px; 
+	width:40px;
+	display:inline-block; 
+	color:white; 
+	background-repeat:no-repeat; 			
+	font-family: Arial;
+	font-size:12px;
+}
+	
+.pointer span 
+{
+	text-align:center;
+	margin: 10px 0px 0px 0px;
+	display: block;
+}
+
+#main_div
+{
+	margin: 6px 0px 10px 0px;
+}
+
+#main_div a
+{
+	color: #cc1111;
+	font-weight: bold;
+}
+

@@ -1,0 +1,28 @@
+{
+  "version": "1.0",
+  "name": "Pointers",
+  "description": "YouTube Seek Pointers",
+
+  "content_scripts" : [
+  {
+	 "matches": [
+        "*://*.youtube.com/*", "*://youtube.com/*"
+      ],
+	 "js" : [
+		"js/jquery.js",
+		"js/jquery-ui.js",
+		"content_script.js"
+		],
+	 "css": ["main.css"],
+	 "all_frames" : true,
+	 "run_at" : "document_end"
+  }],
+  
+   "icons": {
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png",
+	"256": "icons/icon256.png"
+  },
+  
+  "permissions": ["tabs"]
+}
