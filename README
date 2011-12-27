@@ -1,0 +1,1 @@
+Pointers is a Google Chrome extension to add seek markers / pointers to the YouTube timeline. You can add as many pointers you wish, drag them on the timeline, delete them and seek to that point in the video by clicking the marker. Extension uses content scripts, jquery and jquery-ui. 
