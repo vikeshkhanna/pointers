@@ -31,6 +31,24 @@
 	display: block;
 }
 
+.loop_pointer
+{
+	height:40px; 
+	width:40px;
+	display:inline-block; 
+	color:white; 
+	background-repeat:no-repeat; 			
+	font-family: Arial;
+	font-size:12px;
+}
+	
+.loop_pointer span 
+{
+	text-align:center;
+	margin: 10px 0px 0px 0px;
+	display: block;
+}
+
 #main_div
 {
 	margin: 6px 0px 10px 0px;

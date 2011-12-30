@@ -3,7 +3,6 @@
 	@date : 22nd December 2011
 */
 
-
 var player;
 var main_div;
 var base_bar;
@@ -16,8 +15,13 @@ var overlay_bar;
 var death_mode = false;
 var extension_disabled = false;
 
-var callout_death = "url('" + chrome.extension.getURL("images/callout_death.png") + "')";
 var callout = "url('" + chrome.extension.getURL("images/callout.png") + "')";
+var callout_death = "url('" + chrome.extension.getURL("images/callout_death.png") + "')";
+var callout_loop = "url('" + chrome.extension.getURL("images/callout_loop.png") + "')";
+
+/* loop variables */
+var loop_t1 = null;
+var loop_t2 = null;
 
 function Pointer()
 {
@@ -66,19 +70,30 @@ $(document).ready(function(){
 		}
 	
 		$(document).keydown(function(event){ 
-					if(event.keyCode == '16')  //shift key
-						$(".pointer").draggable("enable");
-					else if(event.keyCode=='17') //ctrl key
-					{
-						death_mode = true;
-						$(".pointer").css('backgroundImage', callout_death);
-					}
+						if(event.keyCode == '16')  //shift key for moving
+						{
+							$(".pointer").draggable("enable");
+						}
+						else if(event.keyCode=='17') //ctrl key for deletion
+						{
+							death_mode = true;
+							$(".pointer").css('backgroundImage', callout_death);
+						}
+						else if(event.keyCode == '18') //alt key for loop
+						{
+							loop_mode = true;
+						}	
 					});
 					
 				$(document).keyup(function(){ 
 						$(".pointer").draggable("disable");
-						death_mode = false;
 						$(".pointer").css('backgroundImage', callout);
+						
+						$("#loop_pointer_1").css("backgroundImage", callout_loop);
+						$("#loop_pointer_2").css("backgroundImage", callout_loop);
+						
+						loop_mode = false;
+						death_mode = false;
 					});
 					
 		if(!extension_disabled) 
@@ -97,22 +112,80 @@ function generateNewPointer()
 	//div_pointers.insertBefore(pointer.element, div_pointers.firstChild);
 	
 	$(function() {
-		$(".pointer").draggable( {axis: "x", drag: handleDrag, disabled : true, addClasses: false});
-		$(".pointer").mouseover(function(){ this.style.cursor = "pointer"; } );	
-
-		$(".pointer").click( function(){
+		$(pointer.element).draggable( {axis: "x", drag: handleDrag, disabled : true, addClasses: false});
+		$(pointer.element).mouseover(function(){ this.style.cursor = "pointer"; } );	
+		
+		$(pointer.element).dblclick( function() { $(this).draggable("enable"); } );
+		
+		$(pointer.element).click( function(){
 						/* seek code goes here */
+						
 						//alert("You Clicked");
 						if(death_mode)
 						{
 							console.log("<pointers> deleting a node");
 							this.parentNode.removeChild(this);
 							
+							//handle loopers carefully
+							if(this.id == 'loop_pointer_1' )
+								loop_t1 = null;
+							else if(this.id == 'loop_pointer_2')
+								loop_t2 = null;
+							
 							//pointers may be misplaced after deletion
 							var pointers = document.getElementsByClassName('pointer');
 							
 							for(var i = 0; i < pointers.length; i++)
 								setReadableTime(pointers[i]);
+						}
+						else if(loop_mode)
+						{
+							var seekTime = getSeekTimeFromObject(this);
+							
+							if(loop_t1 == null && loop_t2 == null) //none of them is set
+							{
+								console.log("<pointers> setting loop - no pointer set");
+								loop_t1 = seekTime;
+								
+								$(this).css('backgroundImage', callout_loop);
+								this.id = 'loop_pointer_1';
+							}
+							else
+							{
+								//toggle case
+								if(this.id == 'loop_pointer_1' || this.id == 'loop_pointer_2')
+								{
+									console.log("<pointers> setting loop - toggle");
+									
+									if(this.id == 'loop_pointer_1')
+										loop_t1 = null;
+									else if(this.id == 'loop_pointer_2')
+										loop_t2 = null;
+									
+									$(this).css('backgroundImage', callout);
+									this.id = " ";
+								}
+								else if(loop_t1 == null || loop_t2 == null) //only one of them is set
+								{
+									console.log("<pointers> setting loop - only one pointer set");
+									
+									if(loop_t1 == null)
+									{
+										loop_t1 = seekTime;
+										this.id = 'loop_pointer_1';
+									}
+									else if(loop_t2 == null)
+									{
+										loop_t2 = seekTime;
+										this.id = 'loop_pointer_2';
+									}
+									
+									$(this).css('backgroundImage', callout_loop);
+								}
+							}
+							
+							console.log("<pointers> New Loop Timers set : (" + loop_t1 + "," + loop_t2 + ")");
+							//alert(loop_t1 + " " + loop_t2);
 						}
 						else
 						{
@@ -173,9 +246,10 @@ function init_ui()
 	btn_disable_extension.style.marginLeft = "10px";
 	
 	var div_info = document.createElement('div');
-	div_info.style.marginLeft = "10px";
-	div_info.style.display = "inline";
-	div_info.innerHTML = "Hold <b>Shift</b> to drag pointers. <b>Ctrl</b> + Click to delete pointers.";
+	div_info.style.margins = "5px 0px 0px 4px";
+	div_info.style.paddingBottom = "5px";
+	
+	div_info.innerHTML = "Hold <b>Shift</b> to drag pointers. <b>Ctrl</b> + Click to delete pointers. <b>Alt</b> + Click to set loopers.";
 	
 	main_div.appendChild(div_pointers);
 	main_div.appendChild(base_bar);
@@ -214,7 +288,7 @@ function set_deferred_ui()
 	try
 	{
 		document.getElementById('base_bar').style.width = player.width ;
-		setOverlayBar();
+		mainTimer();
 	}
 	catch(err)
 	{
@@ -270,6 +344,11 @@ function handleDrag(event, ui)
 	setReadableTime(this);
 	var seekTime = getSeekTimeFromObject(this) ;
 	
+	if(this.id == 'loop_pointer_1')
+		loop_t1 = seekTime;
+	else if(this.id == 'loop_pointer_2')
+		loop_t2 = seekTime;
+	
 	if(seekTime > player.getDuration() || seekTime < 0)
 	{
 		this.style.backgroundImage = callout_death;
@@ -285,8 +364,27 @@ function setReadableTime(pointer)
 	pointer.firstChild.innerHTML = getReadableTime(getSeekTimeFromObject(pointer));
 }
 
-function setOverlayBar()
+function mainTimer()
 {
-	overlay_bar.style.width = Math.ceil(player.width * player.getCurrentTime()/player.getDuration()) + "px";
-	setTimeout(setOverlayBar, 500);
+	var currentTime = player.getCurrentTime();
+	
+	//overlaybar
+	overlay_bar.style.width = Math.ceil(player.width * currentTime/player.getDuration()) + "px";
+	
+	//handleLoop
+	var delta = 1; //in seconds
+	
+	if(loop_t1 != null && loop_t2 != null)
+	{
+		var loop_large = (loop_t1 > loop_t2 ? loop_t1 : loop_t2);
+		var loop_small = (loop_t1 < loop_t2 ? loop_t1 : loop_t2);
+		
+		if(currentTime >= loop_large && currentTime <= loop_large + delta)
+			player.seekTo(loop_small);
+	}	
+	
+	if(!extension_disabled)
+		setTimeout(mainTimer, 500);
+	
 }
+
