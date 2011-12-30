@@ -115,8 +115,6 @@ function generateNewPointer()
 		$(pointer.element).draggable( {axis: "x", drag: handleDrag, disabled : true, addClasses: false});
 		$(pointer.element).mouseover(function(){ this.style.cursor = "pointer"; } );	
 		
-		$(pointer.element).dblclick( function() { $(this).draggable("enable"); } );
-		
 		$(pointer.element).click( function(){
 						/* seek code goes here */
 						
@@ -249,7 +247,7 @@ function init_ui()
 	div_info.style.margins = "5px 0px 0px 4px";
 	div_info.style.paddingBottom = "5px";
 	
-	div_info.innerHTML = "Hold <b>Shift</b> to drag pointers. <b>Ctrl</b> + Click to delete pointers. <b>Alt</b> + Click to set loopers.";
+	div_info.innerHTML = "Hold <b>Shift</b> to drag pointers. <b>Ctrl</b> + Click to delete pointers. <b>Alt</b> + Click to set / reset loopers.";
 	
 	main_div.appendChild(div_pointers);
 	main_div.appendChild(base_bar);
